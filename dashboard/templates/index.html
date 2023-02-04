@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Microbusiness Density Forecasting</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+
+    <!-- Bulma Version 0.9.0-->
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.0/css/bulma.min.css" />
+    <link rel="stylesheet" type="text/css" href="../static/css/index.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js" type="text/javascript"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $('#states').change(function() {
+                // window.alert($('#states').val());
+
+                $.getJSON('/update_county_dropdown', {
+                    selected_state: $('#states').val()
+
+                }).success(function(data) {
+                    $('#counties').html(data.html_string_selected);
+                    $('#card-plot').html(data.state_plot);
+                })
+            });
+
+            $('#counties').change(function() {
+                // window.alert($('#counties').val());
+
+                $.getJSON('/update_plot', {
+                    selected_state: $('#states').val(),
+                    selected_county: $('#counties').val()
+
+                }).success(function(data) {
+                    $('#card-plot').html(data.county_plot);
+                })
+            });
+
+            $('#density_states').change(function() {
+                // window.alert($('#density_states').val());
+
+                $.getJSON('/update_density_plot', {
+                    selected_state: $('#density_states').val(),
+                    selected_month: $('#density_months').val()
+
+                }).success(function(data) {
+                    $('#card-density-plot').html(data.density_plot);
+                })
+            });
+
+            $('#density_months').change(function() {
+                // window.alert($('#density_states').val());
+
+                $.getJSON('/update_density_plot', {
+                    selected_state: $('#density_states').val(),
+                    selected_month: $('#density_months').val()
+
+                }).success(function(data) {
+                    $('#card-density-plot').html(data.density_plot);
+                })
+            });
+
+            $('#metrics_states').change(function() {
+                // window.alert($('#density_states').val());
+
+                $.getJSON('/update_metrics_plots', {
+                    selected_state: $('#metrics_states').val(),
+                    selected_year: $('#metrics_years').val()
+
+                }).success(function(data) {
+                    $('#broadband-plot').html(data.broadband_plot);
+                    $('#college-plot').html(data.college_plot);
+                    $('#workforce-plot').html(data.workforce_plot);
+                    $('#income-plot').html(data.income_plot);
+                })
+            });
+
+            $('#metrics_years').change(function() {
+                // window.alert($('#density_states').val());
+
+                $.getJSON('/update_metrics_plots', {
+                    selected_state: $('#metrics_states').val(),
+                    selected_year: $('#metrics_years').val()
+
+                }).success(function(data) {
+                    $('#broadband-plot').html(data.broadband_plot);
+                    $('#college-plot').html(data.college_plot);
+                    $('#workforce-plot').html(data.workforce_plot);
+                    $('#income-plot').html(data.income_plot);
+                })
+            });
+
+            $('#stats_states').change(function() {
+                // window.alert($('#states').val());
+
+                $.getJSON('/update_stats_county_dropdown', {
+                    selected_state: $('#stats_states').val(),
+                    selected_type: $('#stats_type').val()
+
+                }).success(function(data) {
+                    $('#stats_counties').html(data.html_string_selected);
+                    $('#line-plot').html(data.plot);
+                })
+            });
+
+            $('#stats_counties').change(function() {
+                // window.alert($('#counties').val());
+
+                $.getJSON('/update_stats_plot', {
+                    selected_state: $('#stats_states').val(),
+                    selected_county: $('#stats_counties').val(),
+                    selected_type: $('#stats_type').val()
+
+                }).success(function(data) {
+                    $('#line-plot').html(data.plot);
+                })
+            });
+
+            $('#stats_type').change(function() {
+                // window.alert($('#counties').val());
+
+                $.getJSON('/update_stats_plot', {
+                    selected_state: $('#stats_states').val(),
+                    selected_county: $('#stats_counties').val(),
+                    selected_type: $('#stats_type').val()
+
+                }).success(function(data) {
+                    $('#line-plot').html(data.plot);
+                })
+            });
+
+        });
+    </script>
+
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar is-white">
+        <div class="container">
+            <div class="navbar-brand">
+                <h6 class="navbar-item"><a href='/' class='dashboard-link'>Dashboard</a></h6>
+            </div>
+            <!-- <div id="navMenu" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item" href="admin.html">
+                        Home
+                    </a>
+                </div>
+            </div> -->
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="container">
+        <div class="columns">
+            <div class="column is-full">
+                <section class="hero is-info welcome is-small">
+                    <div class="hero-body">
+                        <div class="container">
+                            <h1 class="title" style="text-align: center;">
+                                Microbusiness Density Forecasting Dashboard
+                            </h1>
+                            <h2 class="subtitle" style="text-align: center;">
+                                (As of Oct 2022)
+                            </h2>
+                        </div>
+                    </div>
+                </section>
+                <section class="info-tiles">
+                    <div class="tile is-ancestor has-text-centered">
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">{{ num_states }}</p>
+                                <p class="subtitle">States</p>
+                            </article>
+                        </div>
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">{{ num_counties }}</p>
+                                <p class="subtitle">Counties</p>
+                            </article>
+                        </div>
+                        <div class="tile is-parent">
+                            <article class="tile is-child box">
+                                <p class="title">{{ num_microbusinesses }}</p>
+                                <p class="subtitle">Active Microbusinesses</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+                <div class="rows">
+
+                    <div class="row is-full">
+                        <div class="card events-card">
+                            <header class="card-header">
+                                <p class="card-header-title">Change in number of microbusinesses</p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon"><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                </a>
+                            </header>
+                            <div class="card-plot" id="card-plot">
+                                {{ default_plot|safe }}
+                            </div>
+                            <div class="card-dropdowns">
+                                <div class="row">
+                                    <div class="form-group col-xs-6">
+                                        <label for="states">Select a state</label>
+                                        <select class="form-control" style="color: white; background: #34568B;" id="states">
+                                        {% for o in states %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                    <div class="form-group col-xs-6">
+                                        <label for="counties">Select a county</label>
+                                        <select class="form-control" style="color:white; background:#34568B;" id="counties">
+                                        {% for o in default_counties %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="#" class="card-footer-item">Refresh</a>
+                            </footer>
+                        </div>
+                    </div>
+
+                    <div class="row is-full">
+                        <div class="card events-card">
+                            <header class="card-header">
+                                <p class="card-header-title">Microbusiness Density</p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon"><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                </a>
+                            </header>
+                            <div class="card-density-plot" id="card-density-plot">
+                                {{ density_plot|safe }}
+                            </div>
+                            <div class="card-dropdowns">
+                                <div class="row">
+                                    <div class="form-group col-xs-6">
+                                        <label for="density_states">Select a state</label>
+                                        <select class="form-control" style="color: white; background: #34568B;" id="density_states">
+                                        {% for o in states %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                    <div class="form-group col-xs-6">
+                                        <label for="density_months">Select a month</label>
+                                        <select class="form-control" style="color: white; background: #34568B;" id="density_months">
+                                        {% for o in months %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="#" class="card-footer-item">Refresh</a>
+                            </footer>
+                        </div>
+                    </div>
+
+                    <div class="row is-full">
+                        <div class="card events-card">
+                            <header class="card-header">
+                                <p class="card-header-title">Other metrics</p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon"><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                </a>
+                            </header>
+
+                            <!-- <div class="card-plot" id="card-plot">
+                                {{ broadband_plot|safe }}
+                            </div>
+
+                            <div class="card-plot" id="card-plot">
+                                {{ college_plot|safe }}
+                            </div> -->
+                            <div class="rows">
+
+                                <div class='row'>
+                                    <div class='columns'>
+                                        <div class='column is-6'>
+                                            <div class="card-content">
+                                                <div class="card-plot-metrics" id="broadband-plot">
+                                                    {{ broadband_plot|safe }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='column is-6'>
+                                            <div class="card-content">
+                                                <div class="card-plot-metrics" id="college-plot">
+                                                    {{ college_plot|safe }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class='row'>
+                                    <div class='columns'>
+                                        <div class='column is-6'>
+                                            <div class="card-content">
+                                                <div class="card-plot-metrics" id="workforce-plot">
+                                                    {{ workforce_plot|safe }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='column is-6'>
+                                            <div class="card-content">
+                                                <div class="card-plot-metrics" id="income-plot">
+                                                    {{ hh_income_plot|safe }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card-dropdowns">
+                                <div class="row">
+                                    <div class="form-group col-xs-6">
+                                        <label for="metrics_states">Select a state</label>
+                                        <select class="form-control" style="color: white; background: #34568B;" id="metrics_states">
+                                        {% for o in states %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                    <div class="form-group col-xs-6">
+                                        <label for="metrics_years">Select a year</label>
+                                        <select class="form-control" style="color: white; background: #34568B;" id="metrics_years">
+                                        {% for o in years %}
+                                                <option value="{{ o }}">{{ o }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="#" class="card-footer-item">Refresh</a>
+                            </footer>
+
+                        </div>
+                    </div>
+
+                    <div class="row is-full">
+                        <div class="card events-card">
+                            <header class="card-header">
+                                <p class="card-header-title">Statistics</p>
+                                <a href="#" class="card-header-icon" aria-label="more options">
+                                    <span class="icon"><i class="fa fa-angle-down" aria-hidden="true"></i></span>
+                                </a>
+                            </header>
+
+                            <div class="rows">
+
+                                <div class='row'>
+                                    <div class='columns'>
+                                        <div class='column is-6'>
+                                            <div class="card-content">
+                                                <div class="card-plot-metrics" id="line-plot">
+                                                    {{ broadband_line_plot|safe }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class='column is-6'>
+                                            <div class="card-dropdowns">
+                                                <div class="rows">
+                                                    <div class='row'>
+
+                                                        <br><br><br><br><br><br><br>
+
+                                                        <label for="stats_states">Select a state</label>
+                                                        <select class="form-control" style="color: white; background: #34568B;" id="stats_states">
+                                                            {% for o in states %}
+                                                                <option value="{{ o }}">{{ o }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <br/>
+                                                        <label for="stats_counties">Select a county</label>
+                                                        <select class="form-control" style="color:white; background:#34568B;" id="stats_counties">
+                                                            {% for o in default_counties %}
+                                                                <option value="{{ o }}">{{ o }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <br/>
+                                                        <label for="stats_type">Select a metric</label>
+                                                        <select class="form-control" style="color:white; background:#34568B;" id="stats_type">
+                                                            {% for o in stats_types %}
+                                                                <option value="{{ o }}">{{ o }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <footer class="card-footer">
+                                <a href="#" class="card-footer-item">Refresh</a>
+                            </footer>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <script async type="text/javascript" src="/static/js/bulma.js"></script> -->
+</body>
+
+</html>
